@@ -1,55 +1,49 @@
-[README.md](https://github.com/user-attachments/files/30315645/README.md)
-# Website Availability Checker Solution
+# Website Availability Checker
 
-This is the implementation of the Website Availability Checker, a Streamlit-based web application designed to monitor the status of websites. Users can add URLs to a list, and the application checks if those sites are accessible, displaying each site's status with intuitive emojis.
+A small Streamlit application that checks multiple public websites concurrently and reports their HTTP status.
 
-## Features
+## Improvements and safeguards
 
-- **URL Management**: Users can dynamically add and remove URLs to/from their monitoring list.
-- **Batch Availability Check**: Provides a "Check All" feature to verify the availability of all listed websites at once.
-- **Status Display**: Indicates the availability of each website with a "✅" for accessible sites and a "❌" for inaccessible ones.
-- **Clean URL Formatting**: Automatically formats user-entered URLs to include "https://www.", ensuring consistency in requests.
+- Accepts domains with or without an explicit `http://` or `https://` scheme.
+- Sends one request per website instead of duplicate requests.
+- Checks multiple websites concurrently.
+- Rejects local, private, loopback, and link-local destinations to reduce SSRF risk.
+- Limits each batch to 25 URLs and applies request timeouts.
+- Includes automated tests and GitHub Actions.
 
-## Getting Started
-
-### Prerequisites
-
-Ensure you have the following installed:
-- Python 3.6 or higher
-- Streamlit
-- Requests library
-
-You can install the required Python packages using pip:
+## Run locally
 
 ```bash
-pip install streamlit requests
+git clone https://github.com/Alborzsfe/Site-Connectivity-Checker.git
+cd Site-Connectivity-Checker
+python -m venv .venv
 ```
 
-### Running the Application
-
-1. Clone the repository or download the source code.
-2. Navigate to the directory containing the application.
-3. Run the application using Streamlit:
+Activate the environment, then install and run:
 
 ```bash
+pip install -r requirements.txt
 streamlit run app.py
 ```
 
-4. The Streamlit interface should open in your default web browser, where you can start using the application.
+Enter one website per line, for example:
 
-## Implementation Details
+```text
+example.com
+https://openai.com
+```
 
-- **Streamlit UI**: The application leverages Streamlit for an interactive user interface, allowing users to easily add, remove, and check URLs.
-- **Requests for Checking Availability**: Utilizes Python's `requests` library to send HTTP GET requests to each website, determining their availability based on the response.
-- **URL Formatting**: Includes a function to properly format URLs by adding "https://www." to user inputs, ensuring successful HTTP requests.
+## Tests
 
-## Considerations
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
 
-- **Sequential Checks**: To maintain stability within the Streamlit UI, website availability checks are performed sequentially. While Python's threading could be used for concurrent checks, it may cause issues with Streamlit's re-execution model upon each interaction.
+## Security note
 
-## Future Enhancements
+This project resolves hostnames and blocks non-public IP addresses before requesting a URL. It is still a demonstration project, not a full production monitoring service. Production deployments should also enforce network-level egress restrictions.
 
-- **Asynchronous URL Checks**: Explore methods for implementing non-blocking URL checks that are compatible with Streamlit's execution model.
-- **Persistent Storage**: Integrate a storage solution for persisting the list of URLs across sessions.
-- **Improved URL Validation**: Enhance the URL formatting and validation logic to handle a wider range of user inputs.
+## License
 
+MIT
